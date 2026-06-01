@@ -15,6 +15,12 @@ envault where dev
 ```
 
 Vault files live under `~/.envault/<repo>/` and are encrypted with the external `age` binary using your default SSH key.
+If you need different branches, what I do is:
+```
+envault put dev-main
+envault put dev-feature-branch
+..etc
+```
 
 ```sh
 ENVAULT_ROOT=~/.envault
