@@ -1,0 +1,15 @@
+*~
+.*.swp
+.swp
+*.log
+.DS_Store
+.vscode/
+.direnv/
+.envrc.local
+
+zig-cache/
+.zig-cache/
+zig-out/
+
+/result*
+vgcore.*
