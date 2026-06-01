@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Zig
+        uses: mlugg/setup-zig@v2
+
+      - name: Check formatting
+        run: zig fmt --check build.zig src
+
+      - name: Run tests
+        run: zig build test
+
+      - name: Build debug
+        run: zig build
+
+      - name: Build release
+        run: zig build -Doptimize=ReleaseFast
+
+  smoke:
+    name: Smoke
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Zig
+        uses: mlugg/setup-zig@v2
+
+      - name: Install age
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y age
+
+      - name: Build
+        run: zig build -Doptimize=ReleaseFast
+
+      - name: Exercise put/list/get
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          workdir="$RUNNER_TEMP/envvault-smoke"
+          home="$RUNNER_TEMP/home"
+          vault="$RUNNER_TEMP/vault"
+
+          mkdir -p "$workdir" "$home/.ssh" "$vault"
+          ssh-keygen -q -t ed25519 -N "" -f "$home/.ssh/id_ed25519"
+
+          printf 'TOKEN=ci-secret\n' > "$workdir/.env"
+
+          cd "$workdir"
+          "$GITHUB_WORKSPACE/zig-out/bin/envvault" put dev
+          "$GITHUB_WORKSPACE/zig-out/bin/envvault" put staging
+
+          diff -u <(printf 'dev\nstaging\n') <("$GITHUB_WORKSPACE/zig-out/bin/envvault" list)
+
+          "$GITHUB_WORKSPACE/zig-out/bin/envvault" get dev --to restored.env
+          cmp .env restored.env
+          test "$(stat -c '%a' restored.env)" = "600"
+
+          if "$GITHUB_WORKSPACE/zig-out/bin/envvault" get dev --to restored.env >overwrite.out 2>&1; then
+            echo "expected overwrite refusal" >&2
+            exit 1
+          fi
+          grep -q 'RefusingToOverwrite' overwrite.out
+        env:
+          ENVVAULT_ROOT: ${{ runner.temp }}/vault
+          ENVVAULT_IDENTITY: ${{ runner.temp }}/home/.ssh/id_ed25519
+          ENVVAULT_RECIPIENT: ${{ runner.temp }}/home/.ssh/id_ed25519.pub
