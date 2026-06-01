@@ -1,6 +1,6 @@
 .{
     .name = .envault,
-    .version = "0.0.1",
+    .version = "0.1.0",
     .minimum_zig_version = "0.16.0",
     .paths = .{""},
     .fingerprint = 0x4f0e6c2a3309a1da,

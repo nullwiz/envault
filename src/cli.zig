@@ -116,9 +116,9 @@ pub fn usage(writer: *std.Io.Writer) std.Io.Writer.Error!void {
         \\  env=dev, target=.env, source=.env
         \\
         \\Environment:
-        \\  ENAULT_ROOT
-        \\  ENAULT_IDENTITY
-        \\  ENAULT_RECIPIENT
+        \\  ENVAULT_ROOT
+        \\  ENVAULT_IDENTITY
+        \\  ENVAULT_RECIPIENT
         \\
     );
 }

@@ -80,6 +80,6 @@ jobs:
           fi
           grep -q 'RefusingToOverwrite' overwrite.out
         env:
-          ENAULT_ROOT: ${{ runner.temp }}/vault
-          ENAULT_IDENTITY: ${{ runner.temp }}/home/.ssh/id_ed25519
-          ENAULT_RECIPIENT: ${{ runner.temp }}/home/.ssh/id_ed25519.pub
+          ENVAULT_ROOT: ${{ runner.temp }}/vault
+          ENVAULT_IDENTITY: ${{ runner.temp }}/home/.ssh/id_ed25519
+          ENVAULT_RECIPIENT: ${{ runner.temp }}/home/.ssh/id_ed25519.pub

@@ -17,9 +17,9 @@ envault where dev
 Vault files live under `~/.envault/<repo>/` and are encrypted with the external `age` binary using your default SSH key.
 
 ```sh
-ENAULT_ROOT=~/.envault
-ENAULT_IDENTITY=~/.ssh/id_ed25519
-ENAULT_RECIPIENT=~/.ssh/id_ed25519.pub
+ENVAULT_ROOT=~/.envault
+ENVAULT_IDENTITY=~/.ssh/id_ed25519
+ENVAULT_RECIPIENT=~/.ssh/id_ed25519.pub
 ```
 
 `envault` will not autoload variables, edit shell/Git config, or overwrite `.env` unless `--force` is passed.
