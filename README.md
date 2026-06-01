@@ -1,32 +1,28 @@
-# envvault
-I made this cause I wanted a simple way to get my per-repo .env files from my local; which sometimes
-get lost by switching branches. 
-I did not want any shell hooks, no automated loading.. so that rules out `direnv`. I also did not
-want any repo-specific secret storage like `git-crypt`.
-`pass` or `gopass` were possible, but I wanted something more self-contained without any separate
-synced password-store setup. 
+# envault
+I made this because I wanted a simple way to get my per-repo `.env` files back from a local encrypted vault. They sometimes get lost while switching branches or moving between project states.
 
+I did not want shell hooks or automated loading, so that rules out `direnv`. I also did not want repo-specific secret storage like `git-crypt`. `pass` or `gopass` would work, but I wanted something self-contained without a separate synced password-store setup.
 
-`envvault` is a simple CLI tool to store and retrieve per-repo environment variables in encrypted vault files. 
+`envault` is a simple CLI tool to store and retrieve per-repo environment variables in encrypted vault files.
 It's written in Zig and uses `age` for encryption.
 
 ```sh
-envvault put dev
-envvault get dev
-envvault get dev --force
-envvault list
-envvault where dev
+envault put dev
+envault get dev
+envault get dev --force
+envault list
+envault where dev
 ```
 
-Vault files live under `~/.env-vault/<repo>/` and are encrypted with the external `age` binary using your default SSH key.
+Vault files live under `~/.envault/<repo>/` and are encrypted with the external `age` binary using your default SSH key.
 
 ```sh
-ENVVAULT_ROOT=~/.env-vault
-ENVVAULT_IDENTITY=~/.ssh/id_ed25519
-ENVVAULT_RECIPIENT=~/.ssh/id_ed25519.pub
+ENAULT_ROOT=~/.envault
+ENAULT_IDENTITY=~/.ssh/id_ed25519
+ENAULT_RECIPIENT=~/.ssh/id_ed25519.pub
 ```
 
-`envvault` wont autoload variables, edits shell/Git config, or overwrites `.env` unless `--force` is passed.
+`envault` will not autoload variables, edit shell/Git config, or overwrite `.env` unless `--force` is passed.
 
 ```sh
 zig build

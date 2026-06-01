@@ -107,45 +107,45 @@ fn parseWhere(args: []const []const u8) ParseError!Where {
 pub fn usage(writer: *std.Io.Writer) std.Io.Writer.Error!void {
     try writer.writeAll(
         \\Usage:
-        \\  envvault get [env] [--to .env] [--force] [--print]
-        \\  envvault put [env] [--from .env]
-        \\  envvault list
-        \\  envvault where [env]
+        \\  envault get [env] [--to .env] [--force] [--print]
+        \\  envault put [env] [--from .env]
+        \\  envault list
+        \\  envault where [env]
         \\
         \\Defaults:
         \\  env=dev, target=.env, source=.env
         \\
         \\Environment:
-        \\  ENVVAULT_ROOT
-        \\  ENVVAULT_IDENTITY
-        \\  ENVVAULT_RECIPIENT
+        \\  ENAULT_ROOT
+        \\  ENAULT_IDENTITY
+        \\  ENAULT_RECIPIENT
         \\
     );
 }
 
 test "parse get defaults and flags" {
-    const cmd = try parse(&.{ "envvault", "get", "prod", "--force", "--to", "custom.env" });
+    const cmd = try parse(&.{ "envault", "get", "prod", "--force", "--to", "custom.env" });
     try std.testing.expectEqualStrings("prod", cmd.get.env_name);
     try std.testing.expectEqualStrings("custom.env", cmd.get.target);
     try std.testing.expect(cmd.get.force);
 }
 
 test "parse put defaults" {
-    const cmd = try parse(&.{ "envvault", "put" });
+    const cmd = try parse(&.{ "envault", "put" });
     try std.testing.expectEqualStrings("dev", cmd.put.env_name);
     try std.testing.expectEqualStrings(".env", cmd.put.source);
 }
 
 test "parse get supports print without force" {
-    const cmd = try parse(&.{ "envvault", "get", "--print" });
+    const cmd = try parse(&.{ "envault", "get", "--print" });
     try std.testing.expectEqualStrings("dev", cmd.get.env_name);
     try std.testing.expect(cmd.get.print);
     try std.testing.expect(!cmd.get.force);
 }
 
 test "parse errors are explicit" {
-    try std.testing.expectError(error.UnknownCommand, parse(&.{ "envvault", "edit" }));
-    try std.testing.expectError(error.UnknownOption, parse(&.{ "envvault", "get", "--bad" }));
-    try std.testing.expectError(error.MissingOptionValue, parse(&.{ "envvault", "put", "--from" }));
-    try std.testing.expectError(error.TooManyArguments, parse(&.{ "envvault", "where", "dev", "prod" }));
+    try std.testing.expectError(error.UnknownCommand, parse(&.{ "envault", "edit" }));
+    try std.testing.expectError(error.UnknownOption, parse(&.{ "envault", "get", "--bad" }));
+    try std.testing.expectError(error.MissingOptionValue, parse(&.{ "envault", "put", "--from" }));
+    try std.testing.expectError(error.TooManyArguments, parse(&.{ "envault", "where", "dev", "prod" }));
 }

@@ -55,7 +55,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          workdir="$RUNNER_TEMP/envvault-smoke"
+          workdir="$RUNNER_TEMP/envault-smoke"
           home="$RUNNER_TEMP/home"
           vault="$RUNNER_TEMP/vault"
 
@@ -65,21 +65,21 @@ jobs:
           printf 'TOKEN=ci-secret\n' > "$workdir/.env"
 
           cd "$workdir"
-          "$GITHUB_WORKSPACE/zig-out/bin/envvault" put dev
-          "$GITHUB_WORKSPACE/zig-out/bin/envvault" put staging
+          "$GITHUB_WORKSPACE/zig-out/bin/envault" put dev
+          "$GITHUB_WORKSPACE/zig-out/bin/envault" put staging
 
-          diff -u <(printf 'dev\nstaging\n') <("$GITHUB_WORKSPACE/zig-out/bin/envvault" list)
+          diff -u <(printf 'dev\nstaging\n') <("$GITHUB_WORKSPACE/zig-out/bin/envault" list)
 
-          "$GITHUB_WORKSPACE/zig-out/bin/envvault" get dev --to restored.env
+          "$GITHUB_WORKSPACE/zig-out/bin/envault" get dev --to restored.env
           cmp .env restored.env
           test "$(stat -c '%a' restored.env)" = "600"
 
-          if "$GITHUB_WORKSPACE/zig-out/bin/envvault" get dev --to restored.env >overwrite.out 2>&1; then
+          if "$GITHUB_WORKSPACE/zig-out/bin/envault" get dev --to restored.env >overwrite.out 2>&1; then
             echo "expected overwrite refusal" >&2
             exit 1
           fi
           grep -q 'RefusingToOverwrite' overwrite.out
         env:
-          ENVVAULT_ROOT: ${{ runner.temp }}/vault
-          ENVVAULT_IDENTITY: ${{ runner.temp }}/home/.ssh/id_ed25519
-          ENVVAULT_RECIPIENT: ${{ runner.temp }}/home/.ssh/id_ed25519.pub
+          ENAULT_ROOT: ${{ runner.temp }}/vault
+          ENAULT_IDENTITY: ${{ runner.temp }}/home/.ssh/id_ed25519
+          ENAULT_RECIPIENT: ${{ runner.temp }}/home/.ssh/id_ed25519.pub

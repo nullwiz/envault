@@ -9,19 +9,19 @@ pub fn build(b: *std.Build) void {
         "Run only Zig tests whose names match the filter.",
     ) orelse &.{};
 
-    const mod = b.addModule("envvault", .{
+    const mod = b.addModule("envault", .{
         .root_source_file = b.path("src/root.zig"),
         .target = target,
     });
 
     const exe = b.addExecutable(.{
-        .name = "envvault",
+        .name = "envault",
         .root_module = b.createModule(.{
             .root_source_file = b.path("src/main.zig"),
             .target = target,
             .optimize = optimize,
             .imports = &.{
-                .{ .name = "envvault", .module = mod },
+                .{ .name = "envault", .module = mod },
             },
         }),
     });
@@ -34,18 +34,18 @@ pub fn build(b: *std.Build) void {
         run_cmd.addArgs(args);
     }
 
-    const run_step = b.step("run", "Run envvault");
+    const run_step = b.step("run", "Run envault");
     run_step.dependOn(&run_cmd.step);
 
     const mod_tests = b.addTest(.{
-        .name = "envvault-module-test",
+        .name = "envault-module-test",
         .root_module = mod,
         .filters = test_filters,
     });
     const run_mod_tests = b.addRunArtifact(mod_tests);
 
     const exe_tests = b.addTest(.{
-        .name = "envvault-exe-test",
+        .name = "envault-exe-test",
         .root_module = exe.root_module,
         .filters = test_filters,
     });

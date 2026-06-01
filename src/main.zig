@@ -1,10 +1,10 @@
 const std = @import("std");
-const envvault = @import("envvault");
-const cli = envvault.cli;
-const repo = envvault.repo;
-const vault = envvault.vault;
-const crypto = envvault.crypto;
-const fs_safe = envvault.fs_safe;
+const envault = @import("envault");
+const cli = envault.cli;
+const repo = envault.repo;
+const vault = envault.vault;
+const crypto = envault.crypto;
+const fs_safe = envault.fs_safe;
 
 pub fn main(init: std.process.Init) !void {
     const allocator = init.arena.allocator();
@@ -17,13 +17,13 @@ pub fn main(init: std.process.Init) !void {
     defer stdout.flush() catch {};
 
     const command = cli.parse(args) catch |err| {
-        std.debug.print("envvault: {s}\n\n", .{@errorName(err)});
+        std.debug.print("envault: {s}\n\n", .{@errorName(err)});
         try cli.usage(stdout);
         std.process.exit(2);
     };
 
     run(allocator, io, init.environ_map, stdout, command) catch |err| {
-        std.debug.print("envvault: {s}\n", .{@errorName(err)});
+        std.debug.print("envault: {s}\n", .{@errorName(err)});
         std.process.exit(1);
     };
 }

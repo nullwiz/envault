@@ -10,9 +10,9 @@ pub const Config = struct {
 
 pub fn loadConfig(allocator: std.mem.Allocator, env: *std.process.Environ.Map) !Config {
     return .{
-        .root = try expandHome(allocator, env, env.get("ENVVAULT_ROOT") orelse "~/.env-vault"),
-        .identity = try expandHome(allocator, env, env.get("ENVVAULT_IDENTITY") orelse "~/.ssh/id_ed25519"),
-        .recipient = try expandHome(allocator, env, env.get("ENVVAULT_RECIPIENT") orelse "~/.ssh/id_ed25519.pub"),
+        .root = try expandHome(allocator, env, env.get("ENAULT_ROOT") orelse "~/.envault"),
+        .identity = try expandHome(allocator, env, env.get("ENAULT_IDENTITY") orelse "~/.ssh/id_ed25519"),
+        .recipient = try expandHome(allocator, env, env.get("ENAULT_RECIPIENT") orelse "~/.ssh/id_ed25519.pub"),
     };
 }
 
@@ -55,7 +55,7 @@ test "loadConfig expands defaults under HOME" {
     defer allocator.free(cfg.identity);
     defer allocator.free(cfg.recipient);
 
-    try std.testing.expectEqualStrings("/home/tester/.env-vault", cfg.root);
+    try std.testing.expectEqualStrings("/home/tester/.envault", cfg.root);
     try std.testing.expectEqualStrings("/home/tester/.ssh/id_ed25519", cfg.identity);
     try std.testing.expectEqualStrings("/home/tester/.ssh/id_ed25519.pub", cfg.recipient);
 }
@@ -65,9 +65,9 @@ test "loadConfig honors environment overrides" {
     var env = std.process.Environ.Map.init(allocator);
     defer env.deinit();
     try env.put("HOME", "/home/tester");
-    try env.put("ENVVAULT_ROOT", "~/vault");
-    try env.put("ENVVAULT_IDENTITY", "/keys/id");
-    try env.put("ENVVAULT_RECIPIENT", "/keys/id.pub");
+    try env.put("ENAULT_ROOT", "~/vault");
+    try env.put("ENAULT_IDENTITY", "/keys/id");
+    try env.put("ENAULT_RECIPIENT", "/keys/id.pub");
 
     const cfg = try loadConfig(allocator, &env);
     defer allocator.free(cfg.root);
