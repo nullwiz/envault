@@ -1,3 +1,4 @@
+pub const backup = @import("backup.zig");
 pub const cli = @import("cli.zig");
 pub const crypto = @import("crypto.zig");
 pub const fs_safe = @import("fs_safe.zig");

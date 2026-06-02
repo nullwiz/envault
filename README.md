@@ -12,6 +12,9 @@ envault get dev
 envault get dev --force
 envault list
 envault where dev
+envault backup init --remote git@github.com:you/envault-backup.git
+envault backup commit
+envault backup push
 ```
 
 Vault files live under `~/.envault/<repo>/` and are encrypted with the external `age` binary using your default SSH key.
@@ -29,6 +32,8 @@ ENVAULT_RECIPIENT=~/.ssh/id_ed25519.pub
 ```
 
 `envault` will not autoload variables, edit shell/Git config, or overwrite `.env` unless `--force` is passed.
+
+If you want to back up every encrypted env snapshot, `envault backup init` turns `ENVAULT_ROOT` into a Git repository. `envault backup commit` stages only encrypted `*.env.age` files, so the backup repo should contain ciphertext, not plaintext `.env` files or SSH identities.
 
 ```sh
 zig build

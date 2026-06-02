@@ -5,6 +5,7 @@ const repo = envault.repo;
 const vault = envault.vault;
 const crypto = envault.crypto;
 const fs_safe = envault.fs_safe;
+const backup = envault.backup;
 
 pub fn main(init: std.process.Init) !void {
     const allocator = init.arena.allocator();
@@ -41,6 +42,7 @@ fn run(
         .put => |opts| try cmdPut(allocator, io, env, opts),
         .list => try cmdList(allocator, io, env, stdout),
         .where => |opts| try cmdWhere(allocator, io, env, stdout, opts),
+        .backup => |opts| try cmdBackup(allocator, io, env, opts),
     }
 }
 
@@ -141,4 +143,20 @@ fn cmdWhere(
 ) !void {
     const paths = try commonPaths(allocator, io, env, opts.env_name);
     try stdout.print("{s}\n", .{paths.vault_file});
+}
+
+fn cmdBackup(
+    allocator: std.mem.Allocator,
+    io: std.Io,
+    env: *std.process.Environ.Map,
+    opts: cli.Backup,
+) !void {
+    const cfg = try vault.loadConfig(allocator, env);
+
+    switch (opts) {
+        .init => |init_opts| try backup.init(allocator, io, cfg.root, .{ .remote = init_opts.remote }),
+        .status => try backup.status(allocator, io, cfg.root),
+        .commit => |commit_opts| try backup.commit(allocator, io, cfg.root, .{ .message = commit_opts.message }),
+        .push => try backup.push(allocator, io, cfg.root),
+    }
 }
