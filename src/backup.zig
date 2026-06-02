@@ -11,7 +11,7 @@ pub const Commit = struct {
 pub fn init(allocator: std.mem.Allocator, io: std.Io, root: []const u8, opts: Init) !void {
     try ensureGit(io);
     try std.Io.Dir.cwd().createDirPath(io, root);
-    try runGit(allocator, io, root, &.{ "init" }, .inherit, .inherit);
+    try runGit(allocator, io, root, &.{"init"}, .inherit, .inherit);
     if (opts.remote) |remote| try setRemote(allocator, io, root, remote);
 }
 
@@ -29,7 +29,7 @@ pub fn commit(allocator: std.mem.Allocator, io: std.Io, root: []const u8, opts: 
 
 pub fn push(allocator: std.mem.Allocator, io: std.Io, root: []const u8) !void {
     try ensureGit(io);
-    try runGit(allocator, io, root, &.{ "push" }, .inherit, .inherit);
+    try runGit(allocator, io, root, &.{"push"}, .inherit, .inherit);
 }
 
 fn ensureGit(io: std.Io) !void {
