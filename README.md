@@ -35,6 +35,37 @@ ENVAULT_RECIPIENT=~/.ssh/id_ed25519.pub
 
 If you want to back up every encrypted env snapshot, `envault backup init` turns `ENVAULT_ROOT` into a Git repository. `envault backup commit` stages only encrypted `*.env.age` files, so the backup repo should contain ciphertext, not plaintext `.env` files or SSH identities.
 
+## Install
+
+`age` must be installed and available on `PATH`.
+
+Download a release binary from:
+
+```text
+https://github.com/nullwiz/envault/releases/latest
+```
+
+Available archives:
+
+```text
+envault-x86_64-linux-musl.tar.gz
+envault-aarch64-linux-musl.tar.gz
+envault-x86_64-macos.tar.gz
+envault-aarch64-macos.tar.gz
+envault-x86_64-windows.tar.gz
+envault-aarch64-windows.tar.gz
+```
+
+Example:
+
+```sh
+curl -L -o envault.tar.gz https://github.com/nullwiz/envault/releases/latest/download/envault-x86_64-linux-musl.tar.gz
+tar -xzf envault.tar.gz
+./envault help
+```
+
+Or build from source:
+
 ```sh
 zig build
 zig build test
@@ -52,5 +83,3 @@ Install system-wide:
 ```sh
 sudo zig build -p /usr -Doptimize=ReleaseFast
 ```
-
-`age` must also be installed and available on `PATH`.

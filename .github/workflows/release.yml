@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build release binaries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Zig
+        uses: mlugg/setup-zig@v2
+
+      - name: Build and package
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p artifacts
+
+          build_asset() {
+            local target="$1"
+            local asset="$2"
+            local exe="$3"
+            local prefix="dist/$asset"
+
+            zig build -Doptimize=ReleaseFast -Dtarget="$target" -p "$prefix"
+            tar -czf "artifacts/$asset.tar.gz" -C "$prefix/bin" "$exe"
+          }
+
+          build_asset x86_64-linux-musl envault-x86_64-linux-musl envault
+          build_asset aarch64-linux-musl envault-aarch64-linux-musl envault
+          build_asset x86_64-macos envault-x86_64-macos envault
+          build_asset aarch64-macos envault-aarch64-macos envault
+          build_asset x86_64-windows envault-x86_64-windows envault.exe
+          build_asset aarch64-windows envault-aarch64-windows envault.exe
+
+          (
+            cd artifacts
+            sha256sum *.tar.gz > SHA256SUMS
+          )
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: artifacts/*
+          fail_on_unmatched_files: true

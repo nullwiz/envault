@@ -32,6 +32,21 @@ jobs:
       - name: Build release
         run: zig build -Doptimize=ReleaseFast
 
+      - name: Cross-build release targets
+        shell: bash
+        run: |
+          set -euo pipefail
+          for target in \
+            x86_64-linux-musl \
+            aarch64-linux-musl \
+            x86_64-macos \
+            aarch64-macos \
+            x86_64-windows \
+            aarch64-windows
+          do
+            zig build -Doptimize=ReleaseFast -Dtarget="$target"
+          done
+
   smoke:
     name: Smoke
     runs-on: ubuntu-latest

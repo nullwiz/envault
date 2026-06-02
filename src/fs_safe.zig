@@ -1,4 +1,5 @@
 const std = @import("std");
+const builtin = @import("builtin");
 
 pub const SafeError = error{
     InvalidName,
@@ -44,6 +45,7 @@ pub fn renameIntoPlace(io: std.Io, tmp_path: []const u8, final_path: []const u8)
 }
 
 pub fn chmod600(io: std.Io, path: []const u8) !void {
+    if (builtin.os.tag == .windows) return;
     try std.Io.Dir.cwd().setFilePermissions(io, path, .fromMode(0o600), .{});
 }
 
