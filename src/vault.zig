@@ -9,10 +9,14 @@ pub const Config = struct {
 };
 
 pub fn loadConfig(allocator: std.mem.Allocator, env: *std.process.Environ.Map) !Config {
+    const use_yubikey = isTruthy(env.get("ENVAULT_YUBIKEY"));
+    const default_identity = if (use_yubikey) "~/.envault/yubikey-identity.txt" else "~/.ssh/id_ed25519";
+    const default_recipient = if (use_yubikey) "~/.envault/yubikey-recipient.txt" else "~/.ssh/id_ed25519.pub";
+
     return .{
         .root = try expandHome(allocator, env, env.get("ENVAULT_ROOT") orelse "~/.envault"),
-        .identity = try expandHome(allocator, env, env.get("ENVAULT_IDENTITY") orelse "~/.ssh/id_ed25519"),
-        .recipient = try expandHome(allocator, env, env.get("ENVAULT_RECIPIENT") orelse "~/.ssh/id_ed25519.pub"),
+        .identity = try expandHome(allocator, env, env.get("ENVAULT_IDENTITY") orelse default_identity),
+        .recipient = try expandHome(allocator, env, env.get("ENVAULT_RECIPIENT") orelse default_recipient),
     };
 }
 
@@ -33,7 +37,7 @@ pub fn envFile(allocator: std.mem.Allocator, repo_dir: []const u8, env_name: []c
     return std.fs.path.join(allocator, &.{ repo_dir, filename });
 }
 
-fn expandHome(allocator: std.mem.Allocator, env: *std.process.Environ.Map, value: []const u8) ![]const u8 {
+pub fn expandHome(allocator: std.mem.Allocator, env: *std.process.Environ.Map, value: []const u8) ![]const u8 {
     if (std.mem.eql(u8, value, "~")) {
         return allocator.dupe(u8, env.get("HOME") orelse return error.HomeNotSet);
     }
@@ -42,6 +46,14 @@ fn expandHome(allocator: std.mem.Allocator, env: *std.process.Environ.Map, value
         return std.mem.concat(allocator, u8, &.{ home, value[1..] });
     }
     return allocator.dupe(u8, value);
+}
+
+fn isTruthy(value: ?[]const u8) bool {
+    const raw = value orelse return false;
+    return std.mem.eql(u8, raw, "1") or
+        std.ascii.eqlIgnoreCase(raw, "true") or
+        std.ascii.eqlIgnoreCase(raw, "yes") or
+        std.ascii.eqlIgnoreCase(raw, "on");
 }
 
 test "loadConfig expands defaults under HOME" {
@@ -58,6 +70,23 @@ test "loadConfig expands defaults under HOME" {
     try std.testing.expectEqualStrings("/home/tester/.envault", cfg.root);
     try std.testing.expectEqualStrings("/home/tester/.ssh/id_ed25519", cfg.identity);
     try std.testing.expectEqualStrings("/home/tester/.ssh/id_ed25519.pub", cfg.recipient);
+}
+
+test "loadConfig supports yubikey defaults" {
+    const allocator = std.testing.allocator;
+    var env = std.process.Environ.Map.init(allocator);
+    defer env.deinit();
+    try env.put("HOME", "/home/tester");
+    try env.put("ENVAULT_YUBIKEY", "1");
+
+    const cfg = try loadConfig(allocator, &env);
+    defer allocator.free(cfg.root);
+    defer allocator.free(cfg.identity);
+    defer allocator.free(cfg.recipient);
+
+    try std.testing.expectEqualStrings("/home/tester/.envault", cfg.root);
+    try std.testing.expectEqualStrings("/home/tester/.envault/yubikey-identity.txt", cfg.identity);
+    try std.testing.expectEqualStrings("/home/tester/.envault/yubikey-recipient.txt", cfg.recipient);
 }
 
 test "loadConfig honors environment overrides" {

@@ -32,6 +32,14 @@ jobs:
       - name: Build release
         run: zig build -Doptimize=ReleaseFast
 
+      - name: Install release locally
+        shell: bash
+        run: |
+          set -euo pipefail
+          prefix="$RUNNER_TEMP/envault-install"
+          zig build -p "$prefix" -Doptimize=ReleaseFast
+          "$prefix/bin/envault" help
+
       - name: Cross-build release targets
         shell: bash
         run: |
