@@ -6,6 +6,7 @@ const vault = envault.vault;
 const crypto = envault.crypto;
 const fs_safe = envault.fs_safe;
 const backup = envault.backup;
+const yubikey = envault.yubikey;
 
 pub fn main(init: std.process.Init) !void {
     const allocator = init.arena.allocator();
@@ -43,6 +44,7 @@ fn run(
         .list => try cmdList(allocator, io, env, stdout),
         .where => |opts| try cmdWhere(allocator, io, env, stdout, opts),
         .backup => |opts| try cmdBackup(allocator, io, env, opts),
+        .yubikey => |opts| try cmdYubiKey(allocator, io, env, stdout, opts),
     }
 }
 
@@ -158,5 +160,20 @@ fn cmdBackup(
         .status => try backup.status(allocator, io, cfg.root),
         .commit => |commit_opts| try backup.commit(allocator, io, cfg.root, .{ .message = commit_opts.message }),
         .push => try backup.push(allocator, io, cfg.root),
+    }
+}
+
+fn cmdYubiKey(
+    allocator: std.mem.Allocator,
+    io: std.Io,
+    env: *std.process.Environ.Map,
+    stdout: *std.Io.Writer,
+    opts: cli.YubiKey,
+) !void {
+    switch (opts) {
+        .doctor => try yubikey.doctor(io, stdout),
+        .list => |list_opts| try yubikey.list(io, list_opts),
+        .setup => |setup_opts| try yubikey.setup(allocator, io, env, stdout, setup_opts),
+        .generate => |generate_opts| try yubikey.generate(allocator, io, env, stdout, generate_opts),
     }
 }
